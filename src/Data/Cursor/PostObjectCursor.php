@@ -250,9 +250,9 @@ class PostObjectCursor {
 		/**
 		 * Find out whether this is a meta key based ordering
 		 */
-		$meta_key = $this->get_meta_key( $by );
-		if ( $meta_key ) {
-			$this->compare_with_meta_field( $meta_key, $order );
+		$meta = $this->get_meta_key( $by );
+		if ( $meta ) {
+			$this->compare_with_meta_field( $meta, $order );
 
 			return;
 		}
@@ -262,14 +262,14 @@ class PostObjectCursor {
 	/**
 	 * Compare with meta key field
 	 *
-	 * @param string $meta_key post meta key
+	 * @param array $meta      post meta key
 	 * @param string $order    The comparison string
 	 *
 	 * @return void
 	 */
-	private function compare_with_meta_field( string $meta_key, string $order ) {
-		$meta_type  = $this->get_query_var( 'meta_type' );
-		$meta_value = get_post_meta( $this->cursor_offset, $meta_key, true );
+	private function compare_with_meta_field( array $meta, string $order ) {
+		$meta_type  = $meta['type'];
+		$meta_value = get_post_meta( $this->cursor_offset, $meta['key'], true );
 
 		$key = "{$this->wpdb->postmeta}.meta_value";
 
@@ -287,16 +287,19 @@ class PostObjectCursor {
 	}
 
 	/**
-	 * Get the actual meta key if any
+	 * Get the actual meta key/type if any
 	 *
 	 * @param string $by The order by key
 	 *
 	 * @return string|null
 	 */
-	private function get_meta_key( $by ) {
+	private function get_meta( $by ) {
 
 		if ( 'meta_value' === $by || 'meta_value_num' === $by ) {
-			return $this->get_query_var( 'meta_key' );
+			return array(
+				'key' => $this->get_query_var( 'meta_key' ),
+				'type' => $this->get_query_var( 'meta_type' )
+			);
 		}
 
 		/**
@@ -309,7 +312,7 @@ class PostObjectCursor {
 
 		$clause = $this->query_vars['meta_query'][ $by ];
 
-		return empty( $clause['key'] ) ? null : $clause['key'];
+		return empty( $clause['key'] ) ? null : $clause;
 	}
 
 }
