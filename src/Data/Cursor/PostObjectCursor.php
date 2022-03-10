@@ -250,7 +250,7 @@ class PostObjectCursor {
 		/**
 		 * Find out whether this is a meta key based ordering
 		 */
-		$meta = $this->get_meta_key( $by );
+		$meta = $this->get_meta( $by );
 		if ( $meta ) {
 			$this->compare_with_meta_field( $meta, $order );
 
@@ -296,10 +296,10 @@ class PostObjectCursor {
 	private function get_meta( $by ) {
 
 		if ( 'meta_value' === $by || 'meta_value_num' === $by ) {
-			return array(
-				'key' => $this->get_query_var( 'meta_key' ),
-				'type' => $this->get_query_var( 'meta_type' )
-			);
+			return [
+				'key'  => $this->get_query_var( 'meta_key' ),
+				'type' => $this->get_query_var( 'meta_type' ),
+			];
 		}
 
 		/**
